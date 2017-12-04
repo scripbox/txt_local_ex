@@ -1,21 +1,62 @@
 # TxtLocalEx
 
-**TODO: Add description**
+An Elixir client for sending SMS with **txtLocal** APIs
 
-## Installation
+## Install
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `txt_local_ex` to your list of dependencies in `mix.exs`:
+1. Add `txt_local_ex` to your list of dependencies in `mix.exs`:
+
+  ```elixir
+  def deps do
+    [{:txt_local_ex, "~> 0.0.1"}]
+  end
+  ```
+
+2. Ensure `txt_local_ex` is started before your application:
+
+  ```elixir
+  def application do
+    [applications: [:txt_local_ex]]
+  end
+  ```
+
+
+## Configure
+
+Add the following to your `config.exs` file:
 
 ```elixir
-def deps do
-  [
-    {:txt_local_ex, "~> 0.1.0"}
-  ]
-end
+config :txt_local_ex,
+  token: "YOUR_API_TOKEN"
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/txt_local_ex](https://hexdocs.pm/txt_local_ex).
+* **For Development/Test environments**
 
+Add the following to your `config/dev.exs`/`config/test.exs` file:
+
+```elixir
+config :your_app, :txt_local_ex_api, TxtLocalEx.InMemoryMessenger
+```
+
+* **For Staging/Production environments**
+
+Add the following to your `config/staging.exs`/`config/production.exs` file:
+
+```elixir
+config :your_app, :txt_local_ex_api, TxtLocalEx.HttpMessenger
+```
+
+## Usage
+
+1. Set the messenger to use at the top level
+```elixir
+  @txt_local_api_client Application.get_env(:your_app, :txt_local_ex_api)
+```
+
+2. Send SMS
+  * The `send_sms/4` function sends an sms to a given phone number from a given phone number.
+
+  ```elixir
+ # @txt_local_api_client.send_sms("from_number", "to_number", "body_text")
+ iex(1)> @txt_local_api_client.send_sms("15005550001", "15005550002", "message text")
+```
