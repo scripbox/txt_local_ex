@@ -54,7 +54,7 @@ config :your_app, :txt_local_ex_api, TxtLocalEx.HttpMessenger
 ```
 
 2. Send SMS
-  * The `send_sms/4` function sends an sms to a given phone number from a given phone number.
+  * The `send_sms/3` function sends an sms to a given phone number from a given phone number.
 
   ```elixir
  # @txt_local_api_client.send_sms("from_number", "to_number", "body_text")
