@@ -28,3 +28,5 @@ use Mix.Config
 # here (which is why it is important to import them last).
 #
 #     import_config "#{Mix.env}.exs"
+config :txt_local_ex,
+  api_key: System.get_env("TXT_LOCAL_API_KEY")

@@ -27,7 +27,7 @@ Add the following to your `config.exs` file:
 
 ```elixir
 config :txt_local_ex,
-  token: "YOUR_API_TOKEN"
+  api_key: "YOUR_API_KEY"
 ```
 
 * **For Development/Test environments**
