@@ -4,7 +4,7 @@ defmodule TxtLocalEx.TestMessenger do
   # Public API
 
   @doc """
-  The send_sms/3 function sends an sms to a
+  The send_sms/4 function sends an sms to a
   given phone number from a given phone number.
   ## Example:
     ```
@@ -31,14 +31,14 @@ defmodule TxtLocalEx.TestMessenger do
     }
     ```
   """
-  @spec send_sms(String.t(), String.t(), String.t()) :: map()
-  def send_sms(from, _, _) when from == "", do:
+  @spec send_sms(String.t(), String.t(), String.t(), String.t()) :: map()
+  def send_sms(from, _, _, _) when from == "", do:
     %{"errors" => [%{"code" => 43, "message" => "Invalid sender name"}], "status" => "failure"}
-  def send_sms(_, to, _) when to == "", do:
+  def send_sms(_, to, _, _) when to == "", do:
     %{"errors" => [%{"code" => 4, "message" => "No recipients specified"}], "status" => "failure"}
-  def send_sms(_, _, body) when body == "", do:
+  def send_sms(_, _, body, _) when body == "", do:
     %{"errors" => [%{"code" => 5, "message" => "No message content"}], "status" => "failure"}
-  def send_sms(from, to, body) do
+  def send_sms(from, to, body, _receipt_url \\ "") do
     %{
       "balance" => 1162,
       "batch_id" => 123456789,

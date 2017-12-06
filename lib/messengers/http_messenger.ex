@@ -9,7 +9,7 @@ defmodule TxtLocalEx.HttpMessenger do
   # Public API
 
   @doc """
-  The send_sms/3 function sends an sms to a
+  The send_sms/4 function sends an sms to a
   given phone number from a given phone number.
   ## Example:
     ```
@@ -36,9 +36,9 @@ defmodule TxtLocalEx.HttpMessenger do
     }
     ```
   """
-  @spec send_sms(String.t(), String.t(), String.t()) :: map()
-  def send_sms(from, to, body) do
-    sms_payload = send_sms_payload(from, to, body)
+  @spec send_sms(String.t(), String.t(), String.t(), String.t()) :: map()
+  def send_sms(from, to, body, receipt_url \\ "") do
+    sms_payload = send_sms_payload(from, to, body, receipt_url)
 
     case Request.post(@send_sms_path, sms_payload) do
       {:ok, response} -> response.body
@@ -48,7 +48,10 @@ defmodule TxtLocalEx.HttpMessenger do
 
   # Private API
 
-  defp send_sms_payload(from, to, body) do
+  defp send_sms_payload(from, to, body, "") do
     %{"message" => body, "sender" => from, "numbers" => to}
+  end
+  defp send_sms_payload(from, to, body, receipt_url) do
+    %{"message" => body, "sender" => from, "numbers" => to, "receipt_url" => receipt_url}
   end
 end
