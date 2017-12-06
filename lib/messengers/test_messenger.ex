@@ -38,7 +38,14 @@ defmodule TxtLocalEx.TestMessenger do
     %{"errors" => [%{"code" => 4, "message" => "No recipients specified"}], "status" => "failure"}
   def send_sms(_, _, body, _) when body == "", do:
     %{"errors" => [%{"code" => 5, "message" => "No message content"}], "status" => "failure"}
-  def send_sms(from, to, body, _receipt_url \\ "") do
+  def send_sms(from, to, body, receipt_url) when receipt_url == "", do:
+    send_sms_response(from, to, body)
+  def send_sms(from, to, body, _receipt_url) do
+    send_sms_response(from, to, body)
+  end
+
+  # Private API
+  defp send_sms_response(from, to, body) do
     %{
       "balance" => 1162,
       "batch_id" => 123456789,
