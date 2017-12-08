@@ -44,6 +44,19 @@ defmodule TxtLocalEx.TestMessenger do
     send_sms_response(from, to, body)
   end
 
+  @doc """
+  The time_to_next_bucket/0 function gets the time in ms to next bucket limit.
+  ## Example:
+      ```
+      iex(1)> TxtLocalEx.Messenger.TestMessenger.time_to_next_bucket
+      {:ok, 0} # 0 ms to next bucket reset
+      ```
+  """
+  @spec time_to_next_bucket() :: tuple()
+  def time_to_next_bucket do
+    {:ok, 0}
+  end
+
   # Private API
   defp send_sms_response(from, to, body) do
     %{
