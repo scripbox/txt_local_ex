@@ -1,5 +1,6 @@
 defmodule TxtLocalEx.HttpMessenger do
   @behaviour TxtLocalEx.Messenger
+  @ets_bucket_name "txt-local-rate-limited-api"
 
   # Define API endpoints
   @send_sms_path "/send/?"
