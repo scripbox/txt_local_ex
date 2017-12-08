@@ -27,7 +27,9 @@ Add the following to your `config.exs` file:
 
 ```elixir
 config :txt_local_ex,
-  api_key: "YOUR_API_KEY"
+  api_key: "YOUR_API_KEY",
+  rate_limit_scale: "RATE_LIMIT_SCALE", # in milli seconds
+  rate_limit_count: "RATE_LIMIT_COUNT" # number of api calls allowed within the time scale
 ```
 
 * **For Development/Test environments**
