@@ -6,4 +6,5 @@ defmodule TxtLocalEx.Messenger do
   """
 
   @callback send_sms(from :: String.t, to :: String.t, body :: String.t, receipt_url :: String.t) :: map
+  @callback time_to_next_bucket() :: tuple
 end
