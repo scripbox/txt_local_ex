@@ -5,6 +5,7 @@ defmodule TxtLocalEx.Messenger do
   [messengers in TxtLocalEx](https://github.com/scripbox/txt_local_ex/tree/master/lib/txt_local_ex/messengers).
   """
 
-  @callback send_sms(from :: String.t, to :: String.t, body :: String.t, receipt_url :: String.t) :: map
+  @callback send_sms(from :: String.t, to :: String.t, body :: String.t, receipt_url :: String.t, custom :: String.t) :: map
   @callback time_to_next_bucket() :: tuple
+  @callback name() :: String.t
 end

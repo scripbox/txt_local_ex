@@ -31,17 +31,17 @@ defmodule TxtLocalEx.TestMessenger do
     }
     ```
   """
-  @spec send_sms(String.t(), String.t(), String.t(), String.t()) :: map()
-  def send_sms(from, _, _, _) when from == "", do:
+  @spec send_sms(String.t(), String.t(), String.t(), String.t(), String.t()) :: map()
+  def send_sms(from, _, _, _, _) when from == "", do:
     %{"errors" => [%{"code" => 43, "message" => "Invalid sender name"}], "status" => "failure"}
-  def send_sms(_, to, _, _) when to == "", do:
+  def send_sms(_, to, _, _, _) when to == "", do:
     %{"errors" => [%{"code" => 4, "message" => "No recipients specified"}], "status" => "failure"}
-  def send_sms(_, _, body, _) when body == "", do:
+  def send_sms(_, _, body, _, _) when body == "", do:
     %{"errors" => [%{"code" => 5, "message" => "No message content"}], "status" => "failure"}
-  def send_sms(from, to, body, receipt_url) when receipt_url == "", do:
+  def send_sms(from, to, body, _receipt_url, _custom) do
     send_sms_response(from, to, body)
-  def send_sms(from, to, body, _receipt_url) do
-    send_sms_response(from, to, body)
+  # def send_sms(from, to, body, _receipt_url, _custom) do
+  #   send_sms_response(from, to, body)
   end
 
   @doc """
@@ -55,6 +55,19 @@ defmodule TxtLocalEx.TestMessenger do
   @spec time_to_next_bucket() :: tuple()
   def time_to_next_bucket do
     {:ok, 0}
+  end
+
+  @doc """
+  The name/0 function returns the name of the API Client.
+  ## Example:
+      ```
+      iex(1)> TxtLocalEx.Messenger.TestMessenger.name
+      "[TxtLocal] Test"
+      ```
+  """
+  @spec name() :: String.t()
+  def name do
+    "TXT_LOCAL_TEST"
   end
 
   # Private API

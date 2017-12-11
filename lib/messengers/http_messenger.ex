@@ -38,10 +38,10 @@ defmodule TxtLocalEx.HttpMessenger do
     ```
   """
   @spec send_sms(String.t(), String.t(), String.t(), String.t()) :: map()
-  def send_sms(from, to, body, receipt_url \\ "") do
+  def send_sms(from, to, body, receipt_url \\ "", custom \\ "") do
     check_rate_limit!() # raises ApiLimitExceeded if rate limit exceeded
 
-    sms_payload = send_sms_payload(from, to, body, receipt_url)
+    sms_payload = send_sms_payload(from, to, body, receipt_url, custom)
 
     case Request.post(@send_sms_path, sms_payload) do
       {:ok, response} -> response.body
@@ -66,13 +66,29 @@ defmodule TxtLocalEx.HttpMessenger do
     {:ok, sec_to_next_bucket}
   end
 
+  @doc """
+  The name/0 function returns the name of the API Client.
+  ## Example:
+      ```
+      iex(1)> TxtLocalEx.Messenger.TestMessenger.name
+      "[TxtLocal] Test"
+      ```
+  """
+  @spec name() :: String.t()
+  def name do
+    "TXT_LOCAL_API"
+  end
+
   # Private API
 
-  defp send_sms_payload(from, to, body, "") do
+  defp send_sms_payload(from, to, body, "", "") do
     %{"message" => body, "sender" => from, "numbers" => to}
   end
-  defp send_sms_payload(from, to, body, receipt_url) do
+  defp send_sms_payload(from, to, body, receipt_url, "") do
     %{"message" => body, "sender" => from, "numbers" => to, "receipt_url" => receipt_url}
+  end
+  defp send_sms_payload(from, to, body, receipt_url, custom) do
+    %{"message" => body, "sender" => from, "numbers" => to, "receipt_url" => receipt_url, "custom" => custom}
   end
 
   defp check_rate_limit! do
