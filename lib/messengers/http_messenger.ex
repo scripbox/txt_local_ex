@@ -82,13 +82,17 @@ defmodule TxtLocalEx.HttpMessenger do
   # Private API
 
   defp send_sms_payload(from, to, body, "", "") do
-    %{"message" => body, "sender" => from, "numbers" => to}
+    %{"message" => body, "sender" => from, "numbers" => to, "test" => dry_run?()}
   end
   defp send_sms_payload(from, to, body, receipt_url, "") do
-    %{"message" => body, "sender" => from, "numbers" => to, "receipt_url" => receipt_url}
+    %{"message" => body, "sender" => from, "numbers" => to, "receipt_url" => receipt_url, "test" => dry_run?()}
   end
   defp send_sms_payload(from, to, body, receipt_url, custom) do
-    %{"message" => body, "sender" => from, "numbers" => to, "receipt_url" => receipt_url, "custom" => custom}
+    %{"message" => body, "sender" => from, "numbers" => to, "receipt_url" => receipt_url, "custom" => custom, "test" => dry_run?()}
+  end
+
+  defp dry_run? do
+    Application.get_env(:txt_local_ex, :dry_run) == "1"
   end
 
   defp check_rate_limit! do
