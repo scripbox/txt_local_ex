@@ -31,4 +31,5 @@ use Mix.Config
 config :txt_local_ex,
   api_key: System.get_env("TXT_LOCAL_API_KEY"),
   rate_limit_scale: System.get_env("TXT_LOCAL_RATE_LIMIT_SCALE"), # in milli seconds
-  rate_limit_count: System.get_env("TXT_LOCAL_RATE_LIMIT_COUNT")
+  rate_limit_count: System.get_env("TXT_LOCAL_RATE_LIMIT_COUNT"),
+  dry_run: System.get_env("TXT_LOCAL_DRY_RUN")
