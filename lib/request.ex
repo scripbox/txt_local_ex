@@ -31,6 +31,12 @@ defmodule TxtLocalEx.Request do
     |> Enum.into([])
   end
 
+  # :timeout - timeout to establish a connection, in milliseconds.
+  # :recv_timeout - timeout used when receiving a connection.
+  defp process_request_options(options) do
+    [timeout: 5000, recv_timeout: 2000]
+  end
+
   def process_response_body(body) do
     case Poison.decode(body) do
       { :ok, data } -> data
