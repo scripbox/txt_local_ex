@@ -14,7 +14,7 @@ defmodule TxtLocalEx.HttpMessenger do
   given phone number from a given phone number.
   ## Example:
     ```
-    iex(1)> TxtLocalEx.HttpMessenger.send_sms("15005550006", "15005550001", "test message")
+    iex(1)> TxtLocalEx.HttpMessenger.send_sms("API-KEY", "SENDER", "RECEIVER", "message text")
     %{
       "balance" => 1162,
       "batch_id" => 123456789,
@@ -37,11 +37,12 @@ defmodule TxtLocalEx.HttpMessenger do
     }
     ```
   """
-  @spec send_sms(String.t(), String.t(), String.t(), String.t()) :: map()
-  def send_sms(from, to, body, receipt_url \\ "", custom \\ "") do
-    check_rate_limit!() # raises ApiLimitExceeded if rate limit exceeded
+  @spec send_sms(String.t(), String.t(), String.t(), String.t(), String.t()) :: map()
+  def send_sms(api_key, from, to, body, receipt_url \\ "", custom \\ "") do
+    # raises ApiLimitExceeded if rate limit exceeded
+    check_rate_limit!()
 
-    sms_payload = send_sms_payload(from, to, body, receipt_url, custom)
+    sms_payload = send_sms_payload(api_key, from, to, body, receipt_url, custom)
 
     case Request.post(@send_sms_path, sms_payload) do
       {:ok, response} -> response.body
@@ -59,9 +60,9 @@ defmodule TxtLocalEx.HttpMessenger do
   """
   @spec time_to_next_bucket() :: tuple()
   def time_to_next_bucket do
-    {_, _, ms_to_next_bucket, _, _} = ExRated.inspect_bucket(@ets_bucket_name,
-                                                             time_scale_in_ms(),
-                                                             api_limit())
+    {_, _, ms_to_next_bucket, _, _} =
+      ExRated.inspect_bucket(@ets_bucket_name, time_scale_in_ms(), api_limit())
+
     sec_to_next_bucket = round(ms_to_next_bucket / 1000.0)
     {:ok, sec_to_next_bucket}
   end
@@ -81,14 +82,37 @@ defmodule TxtLocalEx.HttpMessenger do
 
   # Private API
 
-  defp send_sms_payload(from, to, body, "", "") do
-    %{"message" => body, "sender" => from, "numbers" => to, "test" => dry_run?()}
+  defp send_sms_payload(api_key, from, to, body, "", "") do
+    %{
+      "apiKey" => api_key,
+      "message" => body,
+      "sender" => from,
+      "numbers" => to,
+      "test" => dry_run?()
+    }
   end
-  defp send_sms_payload(from, to, body, receipt_url, "") do
-    %{"message" => body, "sender" => from, "numbers" => to, "receipt_url" => receipt_url, "test" => dry_run?()}
+
+  defp send_sms_payload(api_key, from, to, body, receipt_url, "") do
+    %{
+      "apiKey" => api_key,
+      "message" => body,
+      "sender" => from,
+      "numbers" => to,
+      "receipt_url" => receipt_url,
+      "test" => dry_run?()
+    }
   end
-  defp send_sms_payload(from, to, body, receipt_url, custom) do
-    %{"message" => body, "sender" => from, "numbers" => to, "receipt_url" => receipt_url, "custom" => custom, "test" => dry_run?()}
+
+  defp send_sms_payload(api_key, from, to, body, receipt_url, custom) do
+    %{
+      "apiKey" => api_key,
+      "message" => body,
+      "sender" => from,
+      "numbers" => to,
+      "receipt_url" => receipt_url,
+      "custom" => custom,
+      "test" => dry_run?()
+    }
   end
 
   defp dry_run? do
@@ -97,10 +121,12 @@ defmodule TxtLocalEx.HttpMessenger do
 
   defp check_rate_limit! do
     case ExRated.check_rate(@ets_bucket_name, time_scale_in_ms(), api_limit()) do
-      {:ok, current_count} -> {:ok, current_count}
+      {:ok, current_count} ->
+        {:ok, current_count}
+
       {:error, current_count} ->
         raise TxtLocalEx.Errors.ApiLimitExceeded, "API rate limit exceeded - #{current_count}"
-     end
+    end
   end
 
   defp time_scale_in_ms do

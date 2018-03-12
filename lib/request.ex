@@ -7,18 +7,15 @@ defmodule TxtLocalEx.Request do
     @api_url <> url
   end
 
-  defp api_key_param do
-    %{"apiKey" => Application.get_env(:txt_local_ex, :api_key)}
-  end
-
   defp base_headers do
     %{"Content-Type" => "application/x-www-form-urlencoded"}
   end
 
   defp process_request_body(body) when is_map(body) do
-    Map.merge(api_key_param(), body)
-    |> URI.encode_query
+    body
+    |> URI.encode_query()
   end
+
   defp process_request_body(body), do: body
 
   # Override the base headers with any passed in.
@@ -39,7 +36,7 @@ defmodule TxtLocalEx.Request do
 
   def process_response_body(body) do
     case Poison.decode(body) do
-      { :ok, data } -> data
+      {:ok, data} -> data
       _ -> body
     end
   end

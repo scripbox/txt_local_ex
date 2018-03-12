@@ -4,11 +4,11 @@ defmodule TxtLocalEx.Mixfile do
   def project do
     [
       app: :txt_local_ex,
-      version: "0.1.0",
-      elixir: "~> 1.5",
+      version: "0.1.1",
+      elixir: "~> 1.6",
       description: "An Elixir client for sending SMS with txtLocal APIs",
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
       package: package(),
       deps: deps()
     ]
