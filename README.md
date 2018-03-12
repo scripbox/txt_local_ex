@@ -27,7 +27,6 @@ Add the following to your `config.exs` file:
 
 ```elixir
 config :txt_local_ex,
-  api_key: "YOUR_API_KEY",
   rate_limit_scale: "RATE_LIMIT_SCALE", # in milli seconds
   rate_limit_count: "RATE_LIMIT_COUNT" # number of api calls allowed within the time scale
 ```
@@ -56,9 +55,9 @@ config :your_app, :txt_local_ex_api, TxtLocalEx.HttpMessenger
 ```
 
 2. Send SMS
-  * The `send_sms/3` function sends an sms to a given phone number from a given phone number.
+  * The `send_sms/6` function sends an sms to a given phone number from a given phone number.
 
   ```elixir
- # @txt_local_api_client.send_sms("from_number", "to_number", "body_text")
+ # @txt_local_api_client.send_sms("YOUR_API_KEY", "from_number", "to_number", "body_text")
  iex(1)> @txt_local_api_client.send_sms("15005550001", "15005550002", "message text")
 ```
