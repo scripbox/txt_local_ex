@@ -6,6 +6,7 @@ defmodule TxtLocalEx.Messenger do
   """
 
   @callback send_sms(
+              api_key :: String.t(),
               from :: String.t(),
               to :: String.t(),
               body :: String.t(),
