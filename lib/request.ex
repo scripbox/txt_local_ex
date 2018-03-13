@@ -30,7 +30,7 @@ defmodule TxtLocalEx.Request do
 
   # :timeout - timeout to establish a connection, in milliseconds.
   # :recv_timeout - timeout used when receiving a connection.
-  defp process_request_options(options) do
+  defp process_request_options(_options) do
     [timeout: 5000, recv_timeout: 2000]
   end
 
