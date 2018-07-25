@@ -1,6 +1,7 @@
 defmodule TxtLocalEx.HttpMessenger do
   @behaviour TxtLocalEx.Messenger
-  @ets_bucket_name "txt-local-rate-limited-api"
+  @ets_bucket_prefix "txt-local-rate-limited-api"
+  @dry_run_on "1"
 
   # Define API endpoints
   @send_sms_path "/send/?"
@@ -40,7 +41,7 @@ defmodule TxtLocalEx.HttpMessenger do
   @spec send_sms(String.t(), String.t(), String.t(), String.t(), String.t()) :: map()
   def send_sms(api_key, from, to, body, receipt_url \\ "", custom \\ "") do
     # raises ApiLimitExceeded if rate limit exceeded
-    check_rate_limit!()
+    check_rate_limit!(api_key)
 
     sms_payload = send_sms_payload(api_key, from, to, body, receipt_url, custom)
 
@@ -54,14 +55,14 @@ defmodule TxtLocalEx.HttpMessenger do
   The time_to_next_bucket/0 function gets the time in seconds to next bucket limit.
   ## Example:
       ```
-      iex(1)> TxtLocalEx.HttpMessenger.time_to_next_bucket
+      iex(1)> TxtLocalEx.HttpMessenger.time_to_next_bucket(api_key)
       {:ok, 5} # 5 secconds to next bucket reset
       ```
   """
-  @spec time_to_next_bucket() :: tuple()
-  def time_to_next_bucket do
+  @spec time_to_next_bucket(String.t()) :: tuple()
+  def time_to_next_bucket(api_key) do
     {_, _, ms_to_next_bucket, _, _} =
-      ExRated.inspect_bucket(@ets_bucket_name, time_scale_in_ms(), api_limit())
+      ExRated.inspect_bucket(ets_bucket_name(api_key), time_scale_in_ms(), api_limit())
 
     sec_to_next_bucket = round(ms_to_next_bucket / 1000.0)
     {:ok, sec_to_next_bucket}
@@ -71,7 +72,7 @@ defmodule TxtLocalEx.HttpMessenger do
   The name/0 function returns the name of the API Client.
   ## Example:
       ```
-      iex(1)> TxtLocalEx.Messenger.TestMessenger.name
+      iex(1)> TxtLocalEx.HttpMessenger.name
       "[TxtLocal] Test"
       ```
   """
@@ -116,11 +117,11 @@ defmodule TxtLocalEx.HttpMessenger do
   end
 
   defp dry_run? do
-    Application.get_env(:txt_local_ex, :dry_run) == "1"
+    Application.get_env(:txt_local_ex, :dry_run) == @dry_run_on
   end
 
-  defp check_rate_limit! do
-    case ExRated.check_rate(@ets_bucket_name, time_scale_in_ms(), api_limit()) do
+  defp check_rate_limit!(api_key) do
+    case ExRated.check_rate(ets_bucket_name(api_key), time_scale_in_ms(), api_limit()) do
       {:ok, current_count} ->
         {:ok, current_count}
 
@@ -137,5 +138,9 @@ defmodule TxtLocalEx.HttpMessenger do
   defp api_limit do
     {api_limit_rate, _} = Integer.parse(Application.get_env(:txt_local_ex, :rate_limit_count))
     api_limit_rate
+  end
+
+  defp ets_bucket_name(api_key) do
+    @ets_bucket_prefix <> api_key
   end
 end

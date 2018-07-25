@@ -13,6 +13,6 @@ defmodule TxtLocalEx.Messenger do
               receipt_url :: String.t(),
               custom :: String.t()
             ) :: map
-  @callback time_to_next_bucket() :: tuple
+  @callback time_to_next_bucket(String.t()) :: tuple
   @callback name() :: String.t()
 end

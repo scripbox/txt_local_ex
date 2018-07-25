@@ -55,12 +55,12 @@ defmodule TxtLocalEx.TestMessenger do
   The time_to_next_bucket/0 function gets the time in ms to next bucket limit.
   ## Example:
       ```
-      iex(1)> TxtLocalEx.Messenger.TestMessenger.time_to_next_bucket
+      iex(1)> TxtLocalEx.Messenger.TestMessenger.time_to_next_bucket(api_key)
       {:ok, 0} # 0 ms to next bucket reset
       ```
   """
-  @spec time_to_next_bucket() :: tuple()
-  def time_to_next_bucket do
+  @spec time_to_next_bucket(String.t()) :: tuple()
+  def time_to_next_bucket(_) do
     {:ok, 0}
   end
 
