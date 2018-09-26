@@ -97,7 +97,7 @@ defmodule TxtLocalEx.TestMessenger do
     ```
   """
   @spec message_status(String.t(), String.t()) :: map()
-  def message_status(api_key, message_id) do
+  def message_status(_api_key, message_id) do
     message_status_response(message_id)
   end
 
