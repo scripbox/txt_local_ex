@@ -5,6 +5,9 @@ defmodule TxtLocalEx.HttpMessenger do
 
   # Define API endpoints
   @send_sms_path "/send/?"
+  @message_status_path "/status_message/?"
+
+  @api_name "TXT_LOCAL_API"
 
   alias TxtLocalEx.Request
 
@@ -78,7 +81,37 @@ defmodule TxtLocalEx.HttpMessenger do
   """
   @spec name() :: String.t()
   def name do
-    "TXT_LOCAL_API"
+    @api_name
+  end
+
+  @doc """
+  The message_status/2 function can be used to determine the delivery status of a sent message.
+  ## Example:
+    ```
+    iex(1)> TxtLocalEx.HttpMessenger.message_status("API-KEY", "MESSAGE-ID")
+    %{
+      "message" => %{
+        "id" => 1151895224,
+        "recipient" => 918123456789,
+        "type" => "sms",
+        "status" => "D",
+        "date" => "2013-07-04 14:31:18"
+      },
+      "status" => "success"
+    }
+    ```
+  """
+  @spec message_status(String.t(), String.t()) :: map()
+  def message_status(api_key, message_id) do
+    # raises ApiLimitExceeded if rate limit exceeded
+    check_rate_limit!(api_key)
+
+    sms_payload = message_status_payload(api_key, message_id)
+
+    case Request.post(@message_status_path, sms_payload) do
+      {:ok, response} -> response.body
+      {:error, error} -> raise TxtLocalEx.Errors.ApiError, error.reason
+    end
   end
 
   # Private API
@@ -113,6 +146,13 @@ defmodule TxtLocalEx.HttpMessenger do
       "receipt_url" => receipt_url,
       "custom" => custom,
       "test" => dry_run?()
+    }
+  end
+
+  defp message_status_payload(api_key, message_id) do
+    %{
+      "apiKey" => api_key,
+      "message_id" => message_id
     }
   end
 

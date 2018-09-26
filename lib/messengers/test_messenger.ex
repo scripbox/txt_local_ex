@@ -1,6 +1,8 @@
 defmodule TxtLocalEx.TestMessenger do
   @behaviour TxtLocalEx.Messenger
 
+  @api_name "TXT_LOCAL_TEST"
+
   # Public API
 
   @doc """
@@ -74,7 +76,29 @@ defmodule TxtLocalEx.TestMessenger do
   """
   @spec name() :: String.t()
   def name do
-    "TXT_LOCAL_TEST"
+    @api_name
+  end
+
+  @doc """
+  The message_status/2 function can be used to determine the delivery status of a sent message.
+  ## Example:
+    ```
+    iex(1)> TxtLocalEx.TestMessenger.message_status("API-KEY", "MESSAGE-ID")
+    %{
+      "message" => %{
+        "id" => 1151895224,
+        "recipient" => 918123456789,
+        "type" => "sms",
+        "status" => "D",
+        "date" => "2013-07-04 14:31:18"
+      },
+      "status" => "success"
+    }
+    ```
+  """
+  @spec message_status(String.t(), String.t()) :: map()
+  def message_status(api_key, message_id) do
+    message_status_response(message_id)
   end
 
   # Private API
@@ -95,6 +119,19 @@ defmodule TxtLocalEx.TestMessenger do
           "recipient" => to
         }
       ],
+      "status" => "success"
+    }
+  end
+
+  defp message_status_response(message_id) do
+    %{
+      "message" => %{
+        "id" => message_id,
+        "recipient" => 918_123_456_789,
+        "type" => "sms",
+        "status" => "D",
+        "date" => "2013-07-04 14:31:18"
+      },
       "status" => "success"
     }
   end

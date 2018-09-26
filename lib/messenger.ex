@@ -14,5 +14,11 @@ defmodule TxtLocalEx.Messenger do
               custom :: String.t()
             ) :: map
   @callback time_to_next_bucket(String.t()) :: tuple
+
   @callback name() :: String.t()
+
+  @callback message_status(
+              api_key :: String.t(),
+              message_id :: String.t()
+            ) :: map
 end
