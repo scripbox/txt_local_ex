@@ -29,8 +29,10 @@ use Mix.Config
 #
 #     import_config "#{Mix.env}.exs"
 config :txt_local_ex,
-  # api_key: System.get_env("TXT_LOCAL_API_KEY"),
   # in milli seconds
   rate_limit_scale: System.get_env("TXT_LOCAL_RATE_LIMIT_SCALE"),
   rate_limit_count: System.get_env("TXT_LOCAL_RATE_LIMIT_COUNT"),
-  dry_run: System.get_env("TXT_LOCAL_DRY_RUN")
+  dry_run: System.get_env("TXT_LOCAL_DRY_RUN"),
+  default_options: []
+
+import_config "#{Mix.env()}.exs"

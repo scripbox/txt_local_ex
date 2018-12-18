@@ -23,32 +23,28 @@ defmodule TxtLocalEx.HttpMessenger do
       "balance" => 1162,
       "batch_id" => 123456789,
       "cost" => 2,
-      "num_messages" => 2,
-      "message" => {
+      "message" => %{
+        "content" => "This is your message",
         "num_parts" => 1,
-        "sender" => "Jims Autos",
-        "content" => "This is your message"
+        "sender" => "Jims Autos"
       },
-      "messages" => [{
-        "id" => "1151346216",
-        "recipient" => 447123456789
-      },
-      {
-        "id" => "1151347780",
-        "recipient" => 447987654321
-      }],
+      "messages" => [
+        %{"id" => "1151346216", "recipient" => 447123456789},
+        %{"id" => "1151347780", "recipient" => 447987654321}
+      ],
+      "num_messages" => 2,
       "status" => "success"
     }
     ```
   """
-  @spec send_sms(String.t(), String.t(), String.t(), String.t(), String.t()) :: map()
+  @spec send_sms(String.t(), String.t(), String.t(), String.t(), String.t(), String.t()) :: map()
   def send_sms(api_key, from, to, body, receipt_url \\ "", custom \\ "") do
     # raises ApiLimitExceeded if rate limit exceeded
     check_rate_limit!(api_key)
 
     sms_payload = send_sms_payload(api_key, from, to, body, receipt_url, custom)
 
-    case Request.post(@send_sms_path, sms_payload) do
+    case Request.request(:post, @send_sms_path, sms_payload) do
       {:ok, response} -> response.body
       {:error, error} -> raise TxtLocalEx.Errors.ApiError, error.reason
     end
@@ -58,7 +54,7 @@ defmodule TxtLocalEx.HttpMessenger do
   The time_to_next_bucket/0 function gets the time in seconds to next bucket limit.
   ## Example:
       ```
-      iex(1)> TxtLocalEx.HttpMessenger.time_to_next_bucket(api_key)
+      iex(1)> TxtLocalEx.HttpMessenger.time_to_next_bucket("API-KEY")
       {:ok, 5} # 5 secconds to next bucket reset
       ```
   """
@@ -108,7 +104,7 @@ defmodule TxtLocalEx.HttpMessenger do
 
     sms_payload = message_status_payload(api_key, message_id)
 
-    case Request.post(@message_status_path, sms_payload) do
+    case Request.request(:post, @message_status_path, sms_payload) do
       {:ok, response} -> response.body
       {:error, error} -> raise TxtLocalEx.Errors.ApiError, error.reason
     end
