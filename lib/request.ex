@@ -1,43 +1,41 @@
 defmodule TxtLocalEx.Request do
-  use HTTPoison.Base
-
   @api_url "http://api.textlocal.in"
 
-  def process_url(url) do
+  @default_headers [{"Content-Type", "application/x-www-form-urlencoded"}]
+  @default_options Application.get_env(:txt_local_ex, :default_options)
+
+  def request(method, url, data) do
+    method
+    |> HTTPoison.request(
+      process_url(url),
+      process_request_body(data),
+      @default_headers,
+      @default_options
+    )
+    |> process_response()
+  end
+
+  defp process_url(url) do
     @api_url <> url
   end
 
-  defp base_headers do
-    %{"Content-Type" => "application/x-www-form-urlencoded"}
+  defp process_request_body(body) when is_map(body) do
+    Jason.encode!(body)
   end
 
-  def process_request_body(body) when is_map(body) do
-    body
-    |> URI.encode_query()
-  end
+  defp process_request_body(body), do: body
 
-  def process_request_body(body), do: body
+  defp process_response({:ok, %{body: body} = response}) do
+    case Jason.decode(body) do
+      {:ok, data} ->
+        {:ok, %{response | body: data}}
 
-  # Override the base headers with any passed in.
-  def process_request_headers(request_headers) do
-    headers =
-      request_headers
-      |> Enum.into(%{})
-
-    Map.merge(base_headers(), headers)
-    |> Enum.into([])
-  end
-
-  # :timeout - timeout to establish a connection, in milliseconds.
-  # :recv_timeout - timeout used when receiving a connection.
-  def process_request_options(_options) do
-    [timeout: 5000, recv_timeout: 2000]
-  end
-
-  def process_response_body(body) do
-    case Poison.decode(body) do
-      {:ok, data} -> data
-      _ -> body
+      _ ->
+        {:error, %TxtLocalEx.Errors.ApiError{reason: "error decoding response body"}}
     end
+  end
+
+  defp process_response(response) do
+    response
   end
 end
