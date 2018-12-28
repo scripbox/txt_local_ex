@@ -4,10 +4,10 @@ defmodule TxtLocalEx.Mixfile do
   def project do
     [
       app: :txt_local_ex,
-      version: "0.1.2",
+      version: "0.1.1",
       elixir: "~> 1.6",
-      elixirc_paths: elixirc_paths(Mix.env()),
       description: "An Elixir client for sending SMS with txtLocal APIs",
+      build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       package: package(),
       deps: deps()
@@ -17,22 +17,17 @@ defmodule TxtLocalEx.Mixfile do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      mod: {TxtLocalEx, []},
-      extra_applications: [:logger]
+      extra_applications: [:logger, :httpoison],
+      mod: {TxtLocalEx, []}
     ]
   end
-
-  # Specifies which paths to compile per environment.
-  defp elixirc_paths(env) when env in ~w(test dev)a, do: ["lib", "test/support"]
-  defp elixirc_paths(_), do: ["lib"]
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:httpoison, "~> 1.2"},
-      {:jason, "~> 1.1.0"},
-      {:ex_rated, "~> 1.2"},
-      {:mock, "~> 0.3.0", only: :test}
+      {:httpoison, "~> 1.1"},
+      {:poison, "~> 3.1"},
+      {:ex_rated, "~> 1.2"}
     ]
   end
 
