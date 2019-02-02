@@ -13,6 +13,13 @@ defmodule TxtLocalEx.Messenger do
               receipt_url :: String.t(),
               custom :: String.t()
             ) :: map
+
+  @callback bulk_send(
+              api_key :: String.t(),
+              from :: String.t(),
+              messages :: List.t()
+            ) :: map
+
   @callback time_to_next_bucket(String.t()) :: tuple
 
   @callback name() :: String.t()
@@ -20,5 +27,10 @@ defmodule TxtLocalEx.Messenger do
   @callback message_status(
               api_key :: String.t(),
               message_id :: String.t()
+            ) :: map
+
+  @callback batch_status(
+              api_key :: String.t(),
+              batch_id :: String.t()
             ) :: map
 end
