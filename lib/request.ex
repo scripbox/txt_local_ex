@@ -31,7 +31,7 @@ defmodule TxtLocalEx.Request do
         {:ok, %{response | body: data}}
 
       _ ->
-        {:error, %TxtLocalEx.Errors.ApiError{reason: "error decoding response body"}}
+        {:error, %TxtLocalEx.Errors.ApiError{reason: "error decoding response body", args: body}}
     end
   end
 
