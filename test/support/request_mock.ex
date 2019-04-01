@@ -1,8 +1,13 @@
 defmodule RequestMock do
   # Public API
-  def request(method, url, body, _headers, _opts) do
+  def successful_api_response(method, url, body, _headers, _opts) do
     send(self(), %{method: method, url: url, body: body})
     {:ok, %{body: successful_response()}}
+  end
+
+  def invalid_api_response(method, url, body, _headers, _opts) do
+    send(self(), %{method: method, url: url, body: body})
+    {:error, %TxtLocalEx.Errors.ApiError{reason: "error decoding response body", args: body}}
   end
 
   # Private API

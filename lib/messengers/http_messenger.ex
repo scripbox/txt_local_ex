@@ -46,7 +46,7 @@ defmodule TxtLocalEx.HttpMessenger do
 
     case Request.request(:post, @send_sms_path, sms_payload) do
       {:ok, response} -> response.body
-      {:error, error} -> raise TxtLocalEx.Errors.ApiError, error.reason
+      {:error, error} -> raise error
     end
   end
 
@@ -106,7 +106,7 @@ defmodule TxtLocalEx.HttpMessenger do
 
     case Request.request(:post, @message_status_path, sms_payload) do
       {:ok, response} -> response.body
-      {:error, error} -> raise TxtLocalEx.Errors.ApiError, error.reason
+      {:error, error} -> raise error
     end
   end
 
@@ -162,7 +162,10 @@ defmodule TxtLocalEx.HttpMessenger do
         {:ok, current_count}
 
       {:error, current_count} ->
-        raise TxtLocalEx.Errors.ApiLimitExceeded, "API rate limit exceeded - #{current_count}"
+        raise %TxtLocalEx.Errors.ApiLimitExceeded{
+          reason: "API rate limit exceeded - #{current_count}",
+          args: api_key
+        }
     end
   end
 
