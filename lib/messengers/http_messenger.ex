@@ -164,7 +164,7 @@ defmodule TxtLocalEx.HttpMessenger do
       {:error, current_count} ->
         raise %TxtLocalEx.Errors.ApiLimitExceeded{
           reason: "API rate limit exceeded - #{current_count}",
-          args: api_key
+          args: [time_scale_in_ms(), api_limit()]
         }
     end
   end
