@@ -40,7 +40,7 @@ defmodule TxtLocalEx.HttpMessenger do
   @spec send_sms(String.t(), String.t(), String.t(), String.t(), String.t(), String.t()) :: map()
   def send_sms(api_key, from, to, body, receipt_url \\ "", custom \\ "") do
     # raises ApiLimitExceeded if rate limit exceeded
-    check_rate_limit!(api_key)
+    if rate_limit_enabled?(), do: check_rate_limit!(api_key)
 
     sms_payload = send_sms_payload(api_key, from, to, body, receipt_url, custom)
 
@@ -100,7 +100,7 @@ defmodule TxtLocalEx.HttpMessenger do
   @spec message_status(String.t(), String.t()) :: map()
   def message_status(api_key, message_id) do
     # raises ApiLimitExceeded if rate limit exceeded
-    check_rate_limit!(api_key)
+    if rate_limit_enabled?(), do: check_rate_limit!(api_key)
 
     sms_payload = message_status_payload(api_key, message_id)
 
@@ -166,6 +166,23 @@ defmodule TxtLocalEx.HttpMessenger do
           reason: "API rate limit exceeded - #{current_count}",
           args: [time_scale_in_ms(), api_limit()]
         }
+    end
+  end
+
+  defp rate_limit_enabled? do
+    {
+      Application.get_env(:txt_local_ex, :rate_limit_count),
+      Application.get_env(:txt_local_ex, :rate_limit_scale)
+    }
+    |> case do
+      {nil, _} ->
+        false
+
+      {_, nil} ->
+        false
+
+      {_, _} ->
+        true
     end
   end
 
