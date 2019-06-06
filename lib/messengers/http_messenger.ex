@@ -5,7 +5,9 @@ defmodule TxtLocalEx.HttpMessenger do
 
   # Define API endpoints
   @send_sms_path "/send/?"
+  @bulk_send_path "/bulk_json/?"
   @message_status_path "/status_message/?"
+  @batch_status_path "/status_batch/?"
 
   @api_name "TXT_LOCAL_API"
 
@@ -14,7 +16,7 @@ defmodule TxtLocalEx.HttpMessenger do
   # Public API
 
   @doc """
-  The send_sms/4 function sends an sms to a
+  The send_sms/6 function sends an sms to a
   given phone number from a given phone number.
   ## Example:
     ```
@@ -49,6 +51,59 @@ defmodule TxtLocalEx.HttpMessenger do
       {:error, error} -> raise error
     end
   end
+
+  @doc """
+  The bulk_send/3 function sends different messages to multiple recipients in bulk.
+  ## Example:
+    ```
+    iex(1)> messages = [
+      %{
+        "number" => "mobile-number",
+        "text" => "This is your message"
+      }
+    ]
+    iex(2)> TxtLocalEx.HttpMessenger.bulk_send("API-KEY", "SENDER", messages)
+    %{
+      "balance_post_send" => 12344,
+      "balance_pre_send" => 12346,
+      "messages" => [
+        %{
+          "balance" => 12345,
+          "batch_id" => 596486325,
+          "cost" => 2,
+          "custom" => "message-custom-id",
+          "message" => %{
+            "content" => "This is your message",
+            "num_parts" => 2,
+            "sender" => "SBTEST"
+          },
+          "messages" => [%{"id" => 1, "recipient" => "mobile-number"}],
+          "num_messages" => 1,
+          "receipt_url" => ""
+        }
+      ],
+      "status" => "success",
+      "total_cost" => 2
+    }
+  """
+  @spec bulk_send(String.t(), String.t(), List.t(), String.t() | nil) :: map()
+  def bulk_send(api_key, from, messages, receipt_url \\ nil)
+
+  def bulk_send(_api_key, _from, [], _), do: %{messages: []}
+
+  def bulk_send(api_key, from, messages, receipt_url) when is_list(messages) do
+    # raises ApiLimitExceeded if rate limit exceeded
+    check_rate_limit!(api_key)
+
+    payload = bulk_send_payload(api_key, from, messages, receipt_url)
+
+    case Request.request(:post, @bulk_send_path, payload) do
+      {:ok, response} -> response.body
+      {:error, error} -> raise TxtLocalEx.Errors.ApiError, error.reason
+    end
+  end
+
+  def bulk_send(_api_key, _from, _messages, _), do: {:error, "Invalid messages payload"}
 
   @doc """
   The time_to_next_bucket/0 function gets the time in seconds to next bucket limit.
@@ -102,9 +157,39 @@ defmodule TxtLocalEx.HttpMessenger do
     # raises ApiLimitExceeded if rate limit exceeded
     if rate_limit_enabled?(), do: check_rate_limit!(api_key)
 
-    sms_payload = message_status_payload(api_key, message_id)
+    message_payload = message_status_payload(api_key, message_id)
 
-    case Request.request(:post, @message_status_path, sms_payload) do
+    case Request.request(:post, @message_status_path, message_payload) do
+      {:ok, response} -> response.body
+      {:error, error} -> raise TxtLocalEx.Errors.ApiError, error.reason
+    end
+  end
+
+  @doc """
+  The batch_status/2 function can be used to generate a delivery report for an entire batch send
+  ## Example:
+    ```
+    iex(1)> TxtLocalEx.HttpMessenger.batch_status("API-KEY", "BATCH-ID")
+    %{
+      "batch_id" => 136546495,
+      "num_messages" => 2,
+      "num_delivered" => 2,
+      "num_undelivered" => 0,
+      "num_unknown" => 0,
+      "num_invalid" => 0,
+      "messages" => [%{"recipient" => 918123456789, "status" => "D"}],
+      "status" => "success"
+    }
+    ```
+  """
+  @spec batch_status(String.t(), String.t()) :: map()
+  def batch_status(api_key, batch_id) do
+    # raises ApiLimitExceeded if rate limit exceeded
+    check_rate_limit!(api_key)
+
+    batch_payload = batch_status_payload(api_key, batch_id)
+
+    case Request.request(:post, @batch_status_path, batch_payload) do
       {:ok, response} -> response.body
       {:error, error} -> raise error
     end
@@ -149,6 +234,29 @@ defmodule TxtLocalEx.HttpMessenger do
     %{
       "apiKey" => api_key,
       "message_id" => message_id
+    }
+  end
+
+  defp batch_status_payload(api_key, batch_id) do
+    %{
+      "apiKey" => api_key,
+      "batch_id" => batch_id
+    }
+  end
+
+  defp bulk_send_payload(api_key, from, messages, receipt_url) do
+    data_payload =
+      %{
+        "sender" => from,
+        "messages" => messages,
+        "receiptUrl" => receipt_url,
+        "test" => dry_run?()
+      }
+      |> Jason.encode!()
+
+    %{
+      "apiKey" => api_key,
+      "data" => data_payload
     }
   end
 
