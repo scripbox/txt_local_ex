@@ -93,7 +93,7 @@ defmodule TxtLocalEx.HttpMessenger do
 
   def bulk_send(api_key, from, messages, receipt_url) when is_list(messages) do
     # raises ApiLimitExceeded if rate limit exceeded
-    check_rate_limit!(api_key)
+    if rate_limit_enabled?(), do: check_rate_limit!(api_key)
 
     payload = bulk_send_payload(api_key, from, messages, receipt_url)
 
@@ -185,7 +185,7 @@ defmodule TxtLocalEx.HttpMessenger do
   @spec batch_status(String.t(), String.t()) :: map()
   def batch_status(api_key, batch_id) do
     # raises ApiLimitExceeded if rate limit exceeded
-    check_rate_limit!(api_key)
+    if rate_limit_enabled?(), do: check_rate_limit!(api_key)
 
     batch_payload = batch_status_payload(api_key, batch_id)
 
