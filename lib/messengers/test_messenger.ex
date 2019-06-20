@@ -112,18 +112,18 @@ defmodule TxtLocalEx.TestMessenger do
     response_messages =
       messages
       |> Enum.with_index()
-      |> Enum.map(fn {_message, i} ->
+      |> Enum.map(fn {message, i} ->
         %{
           "balance" => 12345,
           "batch_id" => i + 1000,
           "cost" => 2,
           "custom" => "",
           "message" => %{
-            "content" => "This is your message",
+            "content" => Map.get(message, "text"),
             "num_parts" => 2,
             "sender" => "SENDER-ID"
           },
-          "messages" => [%{"id" => i + 1, "recipient" => "mobile-number"}],
+          "messages" => [%{"id" => i + 1, "recipient" => Map.get(message, "number")}],
           "num_messages" => 1,
           "receipt_url" => receipt_url
         }
