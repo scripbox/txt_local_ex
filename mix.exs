@@ -4,7 +4,7 @@ defmodule TxtLocalEx.Mixfile do
   def project do
     [
       app: :txt_local_ex,
-      version: "0.1.2",
+      version: "0.1.3",
       elixir: "~> 1.6",
       elixirc_paths: elixirc_paths(Mix.env()),
       description: "An Elixir client for sending SMS with txtLocal APIs",

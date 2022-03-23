@@ -33,6 +33,6 @@ config :txt_local_ex,
   rate_limit_scale: System.get_env("TXT_LOCAL_RATE_LIMIT_SCALE"),
   rate_limit_count: System.get_env("TXT_LOCAL_RATE_LIMIT_COUNT"),
   dry_run: System.get_env("TXT_LOCAL_DRY_RUN"),
-  default_options: []
+  default_options: [ssl: [{:versions, [:"tlsv1.2"]}]]
 
 import_config "#{Mix.env()}.exs"
