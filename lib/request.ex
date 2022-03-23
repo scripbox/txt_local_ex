@@ -1,5 +1,5 @@
 defmodule TxtLocalEx.Request do
-  @api_url "http://api.textlocal.in"
+  @api_url "https://api.textlocal.in"
 
   @default_headers [{"Content-Type", "application/x-www-form-urlencoded"}]
   @default_options Application.get_env(:txt_local_ex, :default_options)
