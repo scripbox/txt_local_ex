@@ -28,6 +28,7 @@ Add the following to your `config.exs` file:
 config :txt_local_ex,
   rate_limit_scale: "RATE_LIMIT_SCALE", # in milli seconds
   rate_limit_count: "RATE_LIMIT_COUNT" # number of api calls allowed within the time scale
+  http_client: TxtLocalEx.HTTPClient.HTTPoison
 ```
 
 * **For Development/Test environments**

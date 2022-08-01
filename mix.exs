@@ -31,8 +31,8 @@ defmodule TxtLocalEx.Mixfile do
     [
       {:httpoison, "~> 1.2"},
       {:jason, "~> 1.1.0"},
-      {:ex_rated, "~> 1.2"},
-      {:mock, "~> 0.3.0", only: :test}
+      {:ex_rated, "~> 2.1.0"},
+      {:mock, "~> 0.3.7", only: :test}
     ]
   end
 

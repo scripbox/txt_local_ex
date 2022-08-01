@@ -3,12 +3,17 @@ defmodule TxtLocalEx.Request do
 
   @default_headers [{"Content-Type", "application/x-www-form-urlencoded"}]
   @default_options Application.get_env(:txt_local_ex, :default_options)
+  @http_client Application.get_env(
+                 :txt_local_ex,
+                 :http_client,
+                 TxtLocalEx.HTTPClient.HTTPoison
+               )
 
-  def request(method, url, data) do
-    method
-    |> HTTPoison.request(
+  def request(method, url, body) do
+    @http_client.request(
+      method,
       process_url(url),
-      process_request_body(data),
+      process_request_body(body),
       @default_headers,
       @default_options
     )
